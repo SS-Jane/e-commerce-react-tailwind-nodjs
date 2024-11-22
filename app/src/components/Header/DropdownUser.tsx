@@ -1,10 +1,37 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
+import config from '../../../config';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        config.apiPath + '/user/info',
+        config.headers(),
+      );
+
+      if (res.data.result !== undefined) {
+        setUser(res.data.result);
+      }
+    } catch (e) {
+      Swal.fire({
+        title: 'error',
+        text: e.message,
+        item: 'error',
+      });
+    }
+  };
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -15,7 +42,7 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {user.name}
           </span>
           <span className="block text-xs">UX Designer</span>
         </span>

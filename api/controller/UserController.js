@@ -8,6 +8,9 @@ dotenv.config();
 
 app.post("/signIn", async (req, res) => {
   try {
+    if (req.body.user == undefined || req.body.pass == undefined) {
+      return res.status(401).send("unauthorized");
+    }
     const user = await prisma.user.findFirst({
       select: {
         id: true,

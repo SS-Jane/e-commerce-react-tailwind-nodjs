@@ -1,10 +1,39 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../Breadcrumbs/Breadcrumb';
+import Swal from 'sweetalert2';
+import config from '../../../config';
 import LogoDark from '../../images/logo/logo-dark.svg';
 import Logo from '../../images/logo/logo.svg';
 
 const SignIn: React.FC = () => {
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
+
+  const handlesSignIn = async () => {
+    try {
+      const res = await axios.post(config.apiPath + '/user/signIn', user);
+      if (res.data.token !== undefined) {
+        localStorage.setItem('token', res.data.token);
+        navigate('/home');
+      }
+    } catch (e) {
+      if (e.response.status === 401) {
+        Swal.fire({
+          title: 'sign in',
+          text: 'username or password invalid',
+          icon: 'warning',
+        });
+      } else {
+        Swal.fire({
+          title: 'error',
+          text: e.message,
+          icon: 'error',
+        });
+      }
+    }
+  };
   return (
     <div className="flex flex-col m-0 items-center justify-center h-screen">
       <div>
@@ -19,8 +48,7 @@ const SignIn: React.FC = () => {
                 </Link>
 
                 <p className="2xl:px-20">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                  suspendisse.
+                  Welcome to the store management system.
                 </p>
 
                 <span className="mt-15 inline-block">
@@ -152,19 +180,21 @@ const SignIn: React.FC = () => {
               <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
                 <span className="mb-1.5 block font-medium">Start for free</span>
                 <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                  Sign In to TailAdmin
+                  Sign In to E-commerce Admin
                 </h2>
 
-                <form>
+                <div>
                   <div className="mb-4">
                     <label className="mb-2.5 block font-medium text-black dark:text-white">
                       Email
                     </label>
                     <div className="relative">
                       <input
-                        type="email"
-                        placeholder="Enter your email"
+                        placeholder="Enter your user"
                         className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        onChange={(e) =>
+                          setUser({ ...user, user: e.target.value })
+                        }
                       />
 
                       <span className="absolute right-4 top-4">
@@ -196,6 +226,9 @@ const SignIn: React.FC = () => {
                         type="password"
                         placeholder="6+ Characters, 1 Capital letter"
                         className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        onChange={(e) =>
+                          setUser({ ...user, pass: e.target.value })
+                        }
                       />
 
                       <span className="absolute right-4 top-4">
@@ -227,6 +260,7 @@ const SignIn: React.FC = () => {
                       type="submit"
                       value="Sign In"
                       className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                      onClick={handlesSignIn}
                     />
                   </div>
 
@@ -275,7 +309,7 @@ const SignIn: React.FC = () => {
                       </Link>
                     </p>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           </div>

@@ -33,7 +33,7 @@ function App() {
     <DefaultLayout>
       <Routes>
         <Route
-          index
+          path='/'
           element={
             <>
               <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />

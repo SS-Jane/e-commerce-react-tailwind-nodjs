@@ -6,6 +6,34 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const checkSignIn = () => {
+  try {
+    const secret = process.env.TOKEN_SECRET;
+    const token = req.headers["authorization"];
+    const result = jwt.verify(token, secret);
+
+    if (result != undefined) {
+      next();
+    }
+  } catch (e) {
+    res.status(500).send({ error: e.message });
+  }
+};
+
+const getUserId = (req,res) => {
+    try {
+        const secret = process.env.TOKEN_SECRET
+        const token = req.herders['authorization']
+        const result = jwt.verify(token, secret)
+
+        if(result != undefined) {
+            return result.id
+        }
+    } catch (e) {
+        res.status(500).send({error: e.message})
+    }
+}
+
 app.post("/signIn", async (req, res) => {
   try {
     if (req.body.user == undefined || req.body.pass == undefined) {

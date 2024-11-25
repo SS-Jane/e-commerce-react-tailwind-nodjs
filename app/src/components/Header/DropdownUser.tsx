@@ -34,7 +34,7 @@ const DropdownUser = () => {
         text: 'Confirm sign out?',
         icon: 'question',
         showCancelButton: true,
-        cancelButtonText: 'No.',
+        cancelButtonText: 'No.Keep Sign in',
         showConfirmButton: true,
         confirmButtonText: 'Yes.Sign out',
       });

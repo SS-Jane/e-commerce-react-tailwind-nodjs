@@ -50,7 +50,7 @@ app.post("/signIn", async (req, res) => {
         status: "use",
       },
     });
-
+    
     if (user != null) {
       const secret = process.env.TOKEN_SECRET;
       const token = jwt.sign(user, secret, { expiresIn: "30d" });

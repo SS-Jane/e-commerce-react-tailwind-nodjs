@@ -5,10 +5,52 @@ import Swal from 'sweetalert2';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
 import config from '../../../config';
+import { useNavigate } from 'react-router-dom';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState({});
+  const navigate = useNavigate();
+
+  const TailwindSwal = Swal.mixin({
+    customClass: {
+      container: 'dark:bg-gray-800 bg-gray-100',
+      popup:
+        'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
+      title: 'text-xl font-bold dark:text-red-400 text-red-600',
+      htmlContainer: 'dark:text-gray-300 text-gray-600',
+      confirmButton:
+        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+      cancelButton:
+        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+    },
+    buttonsStyling: false,
+  });
+
+  const handleSignOut = async () => {
+    try {
+      const button = await TailwindSwal.fire({
+        title: 'Sign out',
+        text: 'Confirm sign out?',
+        icon: 'question',
+        showCancelButton: true,
+        cancelButtonText: 'No.',
+        showConfirmButton: true,
+        confirmButtonText: 'Yes.Sign out',
+      });
+
+      if (button.isConfirmed) {
+        localStorage.removeItem('token');
+        navigate('/');
+      }
+    } catch (e) {
+      Swal.fire({
+        title: 'error',
+        text: e.message,
+        icon: 'error',
+      });
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -76,7 +118,7 @@ const DropdownUser = () => {
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
             <li>
               <Link
-                to="/profile"
+                to="/home/profile"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <svg
@@ -101,7 +143,7 @@ const DropdownUser = () => {
             </li>
             <li>
               <Link
-                to="#"
+                to="/home/profile"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <svg
@@ -122,7 +164,7 @@ const DropdownUser = () => {
             </li>
             <li>
               <Link
-                to="/settings"
+                to="/home/settings"
                 className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >
                 <svg
@@ -146,7 +188,10 @@ const DropdownUser = () => {
               </Link>
             </li>
           </ul>
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+          >
             <svg
               className="fill-current"
               width="22"

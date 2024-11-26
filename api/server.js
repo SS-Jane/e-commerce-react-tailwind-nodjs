@@ -3,7 +3,9 @@ const app = express();
 const bpdyParser = require('body-parser')
 const cors = require('cors')
 
+
 const userController = require("./controller/UserController");
+const productController = require('./controller/ProductController')
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json())
@@ -11,6 +13,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 app.use("/user", userController);
+app.use('/product', productController)
 
 
 

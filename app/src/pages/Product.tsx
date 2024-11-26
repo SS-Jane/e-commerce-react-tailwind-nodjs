@@ -98,9 +98,9 @@ export default function Product() {
           <table className="table">
             <thead>
               <tr>
-                <th className='text-xl w-6/12 text-black'>Name</th>
-                <th className='text-xl w-1/12 text-black text-center'>Cost</th>
-                <th className='text-xl w-1/12 text-black text-center'>Price</th>
+                <th className='text-xl w-6/12 text-black dark:text-white'>Name</th>
+                <th className='text-xl w-1/12 text-black dark:text-white text-center'>Cost</th>
+                <th className='text-xl w-1/12 text-black dark:text-white text-center'>Price</th>
                 <th className='w-1/12'></th>
               </tr>
             </thead>

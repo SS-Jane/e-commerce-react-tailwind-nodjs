@@ -111,8 +111,8 @@ export default function Product() {
                   <td className='text-center'>{item.cost}</td>
                   <td className='text-center'>{item.price}</td>
                   <td>
-                    <button className="btn btn-info mx-1"><FontAwesomeIcon icon={faPenToSquare} /></button>
-                    <button className='btn btn-error mx-1'><FontAwesomeIcon icon={faTrashCan} /></button>
+                    <button className="btn btn-info mx-1"><FontAwesomeIcon icon={faPenToSquare} onClick={e=>handleEdit(item)}/></button>
+                    <button className='btn btn-error mx-1'><FontAwesomeIcon icon={faTrashCan} onClick={e=>handleRemove(item)}/></button>
                   </td>
                 </tr>
               ) : <></>}

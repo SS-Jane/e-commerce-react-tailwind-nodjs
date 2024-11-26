@@ -1,17 +1,46 @@
 import { useState } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import MyModal from '../components/Modal';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import config from '../../config';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 export default function Product() {
-    const inputStyle = "from-control w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-    const [product, setProduct] = useState({})
+  const inputStyle =
+    'from-control w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary';
+  const [product, setProduct] = useState({});
 
-    const handleSave = async () => {
-        
+  const handleSave = async () => {
+    try {
+      product.img = '';
+      product.price = parseInt(product.price);
+      product.cost = parseInt(product.cost);
+
+      const res = await axios.post(
+        config.apiPath + '/product/create',
+        product,
+        config.headers(),
+      );
+
+      if (res.data.message === 'success') {
+        Swal.fire({
+          title: 'save',
+          text: 'success',
+          icon: 'success',
+          timer: 2000,
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'error',
+        text: error.message,
+        icon: 'error',
+      });
     }
+  };
   return (
     <>
       <Breadcrumb pageName="Product" />
@@ -27,25 +56,39 @@ export default function Product() {
         <MyModal id="modalProduct" title="Product">
           <div>
             <div>Product name</div>
-            <input type="text" className={inputStyle} onClick={e => setProduct({ ...product, name : e.target.value })}/>
+            <input
+              type="text"
+              className={inputStyle}
+              onChange={(e) => setProduct({ ...product, name: e.target.value })}
+            />
           </div>
           <div className="mt-3">
             <div>Cost</div>
-            <input type="number" className={inputStyle} onClick={e => setProduct({ ...product, cost : e.target.value })}/>
+            <input
+              type="number"
+              className={inputStyle}
+              onChange={(e) => setProduct({ ...product, cost: e.target.value })}
+            />
           </div>
           <div className="mt-3">
             <div>Price</div>
-            <input type="number" className={inputStyle} onClick={e => setProduct({ ...product, price : e.target.value })}/>
+            <input
+              type="number"
+              className={inputStyle}
+              onChange={(e) => setProduct({ ...product, price: e.target.value })}
+            />
           </div>
           <div className="mt-3">
             <div>Product picture</div>
             <input type="file" className={inputStyle} />
           </div>
           <div className="mt-3">
-            <button className="btn cursor-pointer rounded bg-primary py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90 xsm:px-4"
-            onClick={handleSave}>
+            <button
+              className="btn cursor-pointer rounded bg-primary py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90 xsm:px-4"
+              onClick={handleSave}
+            >
               <FontAwesomeIcon icon={faCheck} />
-              <span className='text-lg'>save</span>
+              <span className="text-lg">save</span>
             </button>
           </div>
         </MyModal>

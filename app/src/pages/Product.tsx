@@ -54,8 +54,6 @@ export default function Product() {
         );
       }
 
-
-
       if (res.data.message === 'success') {
         Swal.fire({
           target: document.getElementById('modalProduct'),
@@ -66,7 +64,7 @@ export default function Product() {
         });
         document.getElementById('modalProduct_btnClose').click();
         fetchData();
-        setProduct({ ...product, id: undefined }) //clear id 
+        setProduct({ ...product, id: undefined }); //clear id
       }
     } catch (error) {
       Swal.fire({
@@ -148,16 +146,23 @@ export default function Product() {
     <>
       <Breadcrumb pageName="Product" />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <button
-          className="btn cursor-pointer rounded bg-primary py-1 px-2 m-2 text-sm font-medium text-white hover:bg-opacity-90 xsm:px-4"
-          onClick={() => {
-            document.getElementById('modalProduct').showModal();
-            clearForm();
-          }}
-        >
-          <FontAwesomeIcon icon={faPlus} />
-          Add product
-        </button>
+        <div className="button m-2">
+          <button 
+            className="btn btn-primary text-white mr-1"
+            onClick={() => {
+              document.getElementById('modalProduct').showModal();
+              clearForm();
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+            Add product
+          </button>
+
+          <button className="btn btn-success text-white ml-1">
+            <FontAwesomeIcon icon={faPlus} />
+            Import from Excel
+          </button>
+        </div>
 
         <div className="container-products overflow-x-auto">
           <table className="table">

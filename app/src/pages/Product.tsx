@@ -76,7 +76,7 @@ export default function Product() {
 
       if (button.isConfirmed) {
         const res = await axios.delete(
-          config.apiPath + '/product/remove' + item.id,
+          config.apiPath + '/product/remove/' + item.id,
           config.headers(),
         );
 
@@ -176,8 +176,12 @@ export default function Product() {
                       <button className="btn btn-info mx-1">
                         <FontAwesomeIcon
                           icon={faPenToSquare}
-                          onClick={(e) => handleEdit(item)}
-                        />
+                          onClick={(e) => {
+                            document.getElementById('modalProduct').showModal();
+                            setProduct(item);
+                          }
+                        }
+                          />
                       </button>
                       <button className="btn btn-error mx-1">
                         <FontAwesomeIcon

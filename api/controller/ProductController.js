@@ -10,42 +10,45 @@ dotenv.config();
 app.post("/create", async (req, res) => {
   try {
     // agr = await prisma.model_name.method
-   await prisma.product.create({
+    await prisma.product.create({
       data: req.body,
     });
-    res.send({ message: 'success' });
+    res.send({ message: "success" });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
 
-app.get('/list' , async (req,res) => {
-    try {
-        const data = await prisma.product.findMany({
-            orderBy : {
-                id : 'desc'
-            }
-        })
-        res.send({ results : data })
-    } catch (error) {
-        res.status(500).send({ error : error.message })
-    }
-})
+app.get("/list", async (req, res) => {
+  try {
+    const data = await prisma.product.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      where: {
+        status : 'use'
+      }
+    });
+    res.send({ results: data });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-app.delete('/remove/:id', async (req,res) =>{
+app.delete("/remove/:id", async (req, res) => {
   try {
     await prisma.product.update({
-      data : {
-        status : 'delete'
+      data: {
+        status: "delete",
       },
-      where : {
-        id : req.params.id
-      }
-    })
-    res.send({ message : 'success'})
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    res.send({ message: "success" });
   } catch (error) {
-    res.status(500).send({ error : error.message })
+    res.status(500).send({ error: error.message });
   }
-})
+});
 
 module.exports = app;

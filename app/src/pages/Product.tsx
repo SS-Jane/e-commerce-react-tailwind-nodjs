@@ -6,7 +6,7 @@ import axios from 'axios';
 import config from '../../config';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCheck, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 
 export default function Product() {
@@ -159,7 +159,7 @@ export default function Product() {
           </button>
 
           <button className="btn btn-success text-white ml-1">
-            <FontAwesomeIcon icon={faPlus} />
+          <FontAwesomeIcon icon={faFileImport} />
             Import from Excel
           </button>
         </div>

@@ -26,8 +26,8 @@ app.get("/list", async (req, res) => {
         id: "desc",
       },
       where: {
-        status : 'use'
-      }
+        status: "use",
+      },
     });
     res.send({ results: data });
   } catch (error) {
@@ -46,6 +46,21 @@ app.delete("/remove/:id", async (req, res) => {
       },
     });
     res.send({ message: "success" });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.put("/update", async (req, res) => {
+  try {
+    await prisma.product.update({
+      data: req.body,
+      where: {
+        id: parseInt(req.body.id),
+      },
+    });
+
+    res.send({ message : 'success'})
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

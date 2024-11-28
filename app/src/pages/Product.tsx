@@ -37,11 +37,24 @@ export default function Product() {
       product.price = parseInt(product.price);
       product.cost = parseInt(product.cost);
 
-      const res = await axios.post(
-        config.apiPath + '/product/create',
-        product,
-        config.headers(),
-      );
+      let res;
+      if (product.id === undefined) {
+        //if id = undefined it mean new data
+        res = await axios.post(
+          config.apiPath + '/product/create',
+          product,
+          config.headers(),
+        );
+      } else {
+        //if id != undefined it mean have this data then update data
+        res = await axios.put(
+          config.apiPath + '/product/update',
+          product,
+          config.headers(),
+        );
+      }
+
+
 
       if (res.data.message === 'success') {
         Swal.fire({
@@ -53,6 +66,7 @@ export default function Product() {
         });
         document.getElementById('modalProduct_btnClose').click();
         fetchData();
+        setProduct({ ...product, id: undefined }) //clear id 
       }
     } catch (error) {
       Swal.fire({
@@ -97,8 +111,6 @@ export default function Product() {
         text: error.message,
         icon: 'error',
       });
-
-      
     }
   };
 
@@ -128,8 +140,6 @@ export default function Product() {
       });
     }
   };
-
-  
 
   useEffect(() => {
     fetchData();
@@ -168,7 +178,10 @@ export default function Product() {
             <tbody>
               {products.length > 0 ? (
                 products.map((item) => (
-                  <tr key={item.id} className="hover:bg-primary hover:text-white text-lg">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-primary hover:text-white text-lg"
+                  >
                     <td>{item.name}</td>
                     <td className="text-center">{item.cost}</td>
                     <td className="text-center">{item.price}</td>
@@ -179,9 +192,8 @@ export default function Product() {
                           onClick={(e) => {
                             document.getElementById('modalProduct').showModal();
                             setProduct(item);
-                          }
-                        }
-                          />
+                          }}
+                        />
                       </button>
                       <button className="btn btn-error mx-1">
                         <FontAwesomeIcon

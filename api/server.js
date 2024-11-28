@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const bpdyParser = require('body-parser')
 const cors = require('cors')
 
 
@@ -11,6 +10,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json())
 // app.use(bodyParser.urlencoded({ extended : true }))
 app.use(cors())
+app.use('/uploads', express.static('uploads'))
 
 app.use("/user", userController);
 app.use('/product', productController)

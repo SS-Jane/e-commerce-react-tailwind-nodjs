@@ -8,7 +8,7 @@ export default function MyModal(props) {
       <dialog id={props.id} className="modal z-1">
         <div className="modal-box text-black dark:text-white bg-white dark:bg-black">
           <div className="flex justify-between">
-            <h3 className="font-bold text-lg">{props.title}</h3>
+            <h3 className="font-bold text-xl">{props.title}</h3>
             <form method="dialog">
               <button ><FontAwesomeIcon icon={faXmark}/></button>
             </form>

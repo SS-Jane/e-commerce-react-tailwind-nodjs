@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import MyModal from '../components/Modal';
 import Swal from 'sweetalert2';
@@ -6,15 +6,22 @@ import axios from 'axios';
 import config from '../../config';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCheck, faFileImport } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlus,
+  faCheck,
+  faFileImport,
+} from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 
 export default function Product() {
   const inputStyle =
     'from-control w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary';
 
-  const [product, setProduct] = useState({});
-  const [products, setProducts] = useState([]);
+  const [product, setProduct] = useState({}); //create, update
+  const [products, setProducts] = useState([]); //show all product
+  const [img, setImg] = useState({});  //file for upload
+  const [previewUrl, setPreviewUrl] = useState('');
+  const refImg = useRef();
 
   const TailwindSwal = Swal.mixin({
     customClass: {
@@ -33,9 +40,9 @@ export default function Product() {
 
   const handleSave = async () => {
     try {
-      product.img = '';
       product.price = parseInt(product.price);
       product.cost = parseInt(product.cost);
+      product.img = await handleUpload();
 
       let res;
       if (product.id === undefined) {
@@ -62,9 +69,12 @@ export default function Product() {
           icon: 'success',
           timer: 2000,
         });
+        setTimeout(2000);
         document.getElementById('modalProduct_btnClose').click();
         fetchData();
         setProduct({ ...product, id: undefined }); //clear id
+        setPreviewUrl('');
+        refImg.current.value = '';
       }
     } catch (error) {
       Swal.fire({
@@ -112,12 +122,55 @@ export default function Product() {
     }
   };
 
+  const handleUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('img', img);
+
+      const res = await axios.post(
+        config.apiPath + '/product/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: localStorage.getItem('token'),
+          },
+        },
+      );
+
+      if (res.data.newName !== undefined) {
+        return res.data.newName;
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'error',
+        text: error.message,
+        icon: 'error',
+      });
+
+      return '';
+    }
+  };
+
+  const selectedFile = (inputFile) => {
+    if (inputFile != undefined) {
+      if (inputFile.length > 0) {
+        const file = inputFile[0];
+        setImg(file);
+        setPreviewUrl(URL.createObjectURL(file));
+      }
+    }
+  };
+
   const clearForm = () => {
     setProduct({
       name: '',
       price: '',
       cost: '',
     });
+    setImg(null);
+    setPreviewUrl('');
+    refImg.current.value = '';
   };
 
   const fetchData = async () => {
@@ -139,6 +192,26 @@ export default function Product() {
     }
   };
 
+  const showImage = (item) => {
+    if (item.img !== '') {
+      return (
+        <img
+          alt="Product-image"
+          className="w-30"
+          src={config.apiPath + '/uploads/' + item.img}
+        />
+      );
+    } else {
+      return (
+        <img
+          alt="default-image"
+          className="w-30"
+          src={config.apiPath + '/uploads/default-image.png'}
+        />
+      );
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -147,7 +220,7 @@ export default function Product() {
       <Breadcrumb pageName="Product" />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="button m-2">
-          <button 
+          <button
             className="btn btn-primary text-white mr-1"
             onClick={() => {
               document.getElementById('modalProduct').showModal();
@@ -159,7 +232,7 @@ export default function Product() {
           </button>
 
           <button className="btn btn-success text-white ml-1">
-          <FontAwesomeIcon icon={faFileImport} />
+            <FontAwesomeIcon icon={faFileImport} />
             Import from Excel
           </button>
         </div>
@@ -168,7 +241,10 @@ export default function Product() {
           <table className="table">
             <thead>
               <tr>
-                <th className="text-xl w-6/12 text-black dark:text-white">
+                <th className="text-xl w-3/12 text-black dark:text-white text-center">
+                  Product picture
+                </th>
+                <th className="text-xl w-4/12 text-black dark:text-white">
                   Name
                 </th>
                 <th className="text-xl w-1/12 text-black dark:text-white text-center">
@@ -177,7 +253,7 @@ export default function Product() {
                 <th className="text-xl w-1/12 text-black dark:text-white text-center">
                   Price
                 </th>
-                <th className="w-1/12"></th>
+                <th className="w-2/12"></th>
               </tr>
             </thead>
             <tbody>
@@ -187,6 +263,9 @@ export default function Product() {
                     key={item.id}
                     className="hover:bg-primary hover:text-white text-lg"
                   >
+                    <td className="flex justify-center items-center">
+                      {showImage(item)}
+                    </td>
                     <td>{item.name}</td>
                     <td className="text-center">{item.cost}</td>
                     <td className="text-center">{item.price}</td>
@@ -197,6 +276,7 @@ export default function Product() {
                           onClick={(e) => {
                             document.getElementById('modalProduct').showModal();
                             setProduct(item);
+                            console.log(product);
                           }}
                         />
                       </button>
@@ -209,16 +289,16 @@ export default function Product() {
                     </td>
                   </tr>
                 ))
-              ) : (
+              ) : 
                 <></>
-              )}
+              }
             </tbody>
           </table>
         </div>
 
         <MyModal id="modalProduct" title="Product">
           <div>
-            <div>Product name</div>
+            <div className='text-lg '>Product name</div>
             <input
               value={product.name}
               type="text"
@@ -227,7 +307,7 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div>Cost</div>
+            <div className='text-lg '>Cost</div>
             <input
               value={product.cost}
               type="number"
@@ -236,7 +316,7 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div>Price</div>
+            <div className='text-lg'>Price</div>
             <input
               value={product.price}
               type="number"
@@ -247,8 +327,29 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div>Product picture</div>
-            <input type="file" className={inputStyle} />
+            <div className='text-lg mt-1'>Product picture</div>
+            <div>
+              {previewUrl.length > 0 ? (
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="h-40 w-40 object-cover mb-2"
+                />
+              ) : (
+                <img
+                  src={product.img !== "" ? (config.apiPath + '/uploads/' + product.img) : (config.apiPath + '/uploads/default-image.png')}
+                  alt="Preview"
+                  className="h-40 w-40 object-cover mb-2"
+                />
+              )}
+                <p>Preview</p>
+              <input
+                type="file"
+                ref={refImg}
+                className={inputStyle}
+                onChange={(e) => selectedFile(e.target.files)}
+              />
+            </div>
           </div>
           <div className="mt-3">
             <button

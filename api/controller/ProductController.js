@@ -32,4 +32,20 @@ app.get('/list' , async (req,res) => {
     }
 })
 
+app.delete('/remove/:id', async (req,res) =>{
+  try {
+    await prisma.product.update({
+      data : {
+        status : 'delete'
+      },
+      where : {
+        id : req.params.id
+      }
+    })
+    res.send({ message : 'success'})
+  } catch (error) {
+    res.status(500).send({ error : error.message })
+  }
+})
+
 module.exports = app;

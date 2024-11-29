@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const fileupload = require("express-fileupload");
+const exceljs = require("exceljs");
 
 dotenv.config();
 
@@ -77,27 +78,69 @@ app.post("/upload", async (req, res) => {
         const fs = require("fs");
         const myDate = new Date();
         const y = myDate.getFullYear();
-        const m = myDate.getMonth()+1;
+        const m = myDate.getMonth() + 1;
         const d = myDate.getDate();
         const h = myDate.getHours();
         const mi = myDate.getMinutes();
         const s = myDate.getSeconds();
         const ms = myDate.getMilliseconds();
 
-        const arrFileName = img.name.split('.');
-        const ext = arrFileName[arrFileName.length - 1]
+        const arrFileName = img.name.split(".");
+        const ext = arrFileName[arrFileName.length - 1];
         //create file name from upload date
-        const newName = `${y}${m}${d}${h}${mi}${s}${ms}.${ext}`
+        const newName = `${y}${m}${d}${h}${mi}${s}${ms}.${ext}`;
 
-        img.mv('./uploads/' + newName, (err) => {
-          if(err) throw err
+        img.mv("./uploads/" + newName, (err) => {
+          if (err) throw err;
 
-          res.send({ newName : newName })
-        })
-      } 
+          res.send({ newName: newName });
+        });
+      }
     } else {
-      res.status(501).send('not implemented')
+      res.status(501).send("not implemented");
     }
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.post("/uploadFromExcel", (req, res) => {
+  try {
+    const fileExcel = req.files.fileExcel;
+
+    fileExcel.mv("./uploads/" + fileExcel.name, async (error) => {
+      if (error) throw error;
+      // read from file and insert to database
+      const workbook = new exceljs.Workbook();
+      await workbook.xlsx.readFile("./uploads/" + fileExcel.name);
+
+      const ws = workbook.getWorksheet(1);
+
+      for (let i = 2; i <= ws.rowCount; i++) {
+        const name = ws.getRow(i).getCell(1).value ?? "";
+        const cost = ws.getRow(i).getCell(2).value ?? 0;
+        const price = ws.getRow(i).getCell(3).value ?? 0;
+
+        //check if each row and cell don't have data
+        if (name != "" && cost >= 0 && price >= 0) {
+          //create data from excel to database
+          await prisma.product.create({
+            data: {
+              name: name,
+              cost: cost,
+              price: price,
+              img: "",
+            },
+          });
+        }
+        }
+        
+      // remove file from server
+      const fs = require("fs");
+      await fs.unlinkSync("./uploads/" + fileExcel.name);
+
+      res.send({ message: "success" });
+    });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

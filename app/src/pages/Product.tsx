@@ -19,9 +19,11 @@ export default function Product() {
 
   const [product, setProduct] = useState({}); //create, update
   const [products, setProducts] = useState([]); //show all product
-  const [img, setImg] = useState({});  //file for upload
+  const [img, setImg] = useState({}); //file for upload
+  const [fileExcel, setFileExcel] = useState({}); //file for excel
   const [previewUrl, setPreviewUrl] = useState('');
-  const refImg = useRef();
+  const refImg = useRef(); //for referent to image upload function and clear data when save or close modal
+  const refExcel = useRef();
 
   const TailwindSwal = Swal.mixin({
     customClass: {
@@ -68,53 +70,17 @@ export default function Product() {
           text: 'success',
           icon: 'success',
           timer: 2000,
+        }).then(()=>{
+          document.getElementById('modalProduct_btnClose').click();
+          fetchData();
+          setProduct({ ...product, id: undefined }); //clear id
+          setPreviewUrl('');
+          refImg.current.value = '';
         });
-        setTimeout(2000);
-        document.getElementById('modalProduct_btnClose').click();
-        fetchData();
-        setProduct({ ...product, id: undefined }); //clear id
-        setPreviewUrl('');
-        refImg.current.value = '';
       }
     } catch (error) {
       Swal.fire({
         target: document.getElementById('modalProduct'),
-        title: 'error',
-        text: error.message,
-        icon: 'error',
-      });
-    }
-  };
-
-  const handleRemove = async (item) => {
-    try {
-      const button = await TailwindSwal.fire({
-        text: 'remove item',
-        title: 'remove',
-        icon: 'question',
-        showCancelButton: true,
-        showConfirmButton: true,
-      });
-
-      if (button.isConfirmed) {
-        const res = await axios.delete(
-          config.apiPath + '/product/remove/' + item.id,
-          config.headers(),
-        );
-
-        if (res.data.message === 'success') {
-          Swal.fire({
-            title: 'remove',
-            text: 'remove success',
-            icon: 'success',
-            timer: 1000,
-          });
-
-          fetchData();
-        }
-      }
-    } catch (error) {
-      Swal.fire({
         title: 'error',
         text: error.message,
         icon: 'error',
@@ -170,7 +136,62 @@ export default function Product() {
     });
     setImg(null);
     setPreviewUrl('');
-    refImg.current.value = '';
+    refImg.current.value = ''; // clear data ipput type file
+  };
+
+  const clearFormExcel = () => {
+    setFileExcel(null);
+    refExcel.current.value = ''; // clear data ipput type file
+  };
+
+  const selectedExcelFile = (fileInput) => {
+    if (fileInput !== undefined) {
+      if (fileInput.length > 0) {
+        setFileExcel(fileInput[0]);
+      }
+    }
+  };
+
+  const handleUploadExcel = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('fileExcel', fileExcel);
+
+      const res = await axios.post(
+        config.apiPath + '/product/uploadFromExcel',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: localStorage.getItem('token'),
+          },
+        },
+      );
+
+      if (res.data.message === 'success') {
+        Swal.fire({
+          target: document.getElementById('modalExcel'),
+          title: 'Upload file',
+          text: 'Upload file success',
+          icon: 'success',
+          timer: 1000,
+        }).then(() => {
+          document.getElementById('modalExcel_btnClose')?.click();
+          clearForm()
+          fetchData() // update new data after import data from excel file
+        })
+      }
+    
+
+    } catch (error) {
+      Swal.fire({
+        target: document.getElementById('modalExcel'),
+        title: 'error',
+        text: error.message,
+        icon: 'error',
+        timer: 1000,
+      });
+    }
   };
 
   const fetchData = async () => {
@@ -231,7 +252,13 @@ export default function Product() {
             Add product
           </button>
 
-          <button className="btn btn-success text-white ml-1">
+          <button
+            className="btn btn-success text-white ml-1"
+            onClick={() => {
+              document.getElementById('modalExcel').showModal();
+              clearFormExcel();
+            }}
+          >
             <FontAwesomeIcon icon={faFileImport} />
             Import from Excel
           </button>
@@ -289,16 +316,16 @@ export default function Product() {
                     </td>
                   </tr>
                 ))
-              ) : 
+              ) : (
                 <></>
-              }
+              )}
             </tbody>
           </table>
         </div>
 
         <MyModal id="modalProduct" title="Product">
           <div>
-            <div className='text-lg '>Product name</div>
+            <div className="text-lg ">Product name</div>
             <input
               value={product.name}
               type="text"
@@ -307,7 +334,7 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div className='text-lg '>Cost</div>
+            <div className="text-lg ">Cost</div>
             <input
               value={product.cost}
               type="number"
@@ -316,7 +343,7 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div className='text-lg'>Price</div>
+            <div className="text-lg">Price</div>
             <input
               value={product.price}
               type="number"
@@ -327,7 +354,7 @@ export default function Product() {
             />
           </div>
           <div className="mt-3">
-            <div className='text-lg mt-1'>Product picture</div>
+            <div className="text-lg mt-1">Product picture</div>
             <div>
               {previewUrl.length > 0 ? (
                 <img
@@ -337,12 +364,16 @@ export default function Product() {
                 />
               ) : (
                 <img
-                  src={product.img !== "" ? (config.apiPath + '/uploads/' + product.img) : (config.apiPath + '/uploads/default-image.png')}
+                  src={
+                    product.img !== ''
+                      ? config.apiPath + '/uploads/' + product.img
+                      : config.apiPath + '/uploads/default-image.png'
+                  }
                   alt="Preview"
                   className="h-40 w-40 object-cover mb-2"
                 />
               )}
-                <p>Preview</p>
+              <p>Preview</p>
               <input
                 type="file"
                 ref={refImg}
@@ -360,6 +391,23 @@ export default function Product() {
               <span className="text-lg">save</span>
             </button>
           </div>
+        </MyModal>
+
+        <MyModal id="modalExcel" title="Choose file">
+          <div className="my-3">Choose excel file for import data</div>
+          <input
+            type="file"
+            className={inputStyle}
+            ref={refExcel}
+            onChange={(e) => selectedExcelFile(e.target.files)}
+          />
+          <button
+            className="btn btn-primary mt-3 text-white"
+            onClick={handleUploadExcel}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+            <span className="text-lg ">save</span>
+          </button>
         </MyModal>
       </div>
     </>

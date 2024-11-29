@@ -25,20 +25,20 @@ export default function Product() {
   const refImg = useRef(); //for referent to image upload function and clear data when save or close modal
   const refExcel = useRef();
 
-  const TailwindSwal = Swal.mixin({
-    customClass: {
-      container: 'dark:bg-gray-800 bg-gray-100',
-      popup:
-        'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
-      title: 'text-xl font-bold dark:text-red-400 text-red-600',
-      htmlContainer: 'dark:text-gray-300 text-gray-600',
-      confirmButton:
-        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-      cancelButton:
-        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-    },
-    buttonsStyling: false,
-  });
+  // const TailwindSwal = Swal.mixin({
+  //   customClass: {
+  //     container: 'dark:bg-gray-800 bg-gray-100',
+  //     popup:
+  //       'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
+  //     title: 'text-xl font-bold dark:text-red-400 text-red-600',
+  //     htmlContainer: 'dark:text-gray-300 text-gray-600',
+  //     confirmButton:
+  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+  //     cancelButton:
+  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+  //   },
+  //   buttonsStyling: false,
+  // });
 
   const handleSave = async () => {
     try {
@@ -303,7 +303,6 @@ export default function Product() {
                           onClick={(e) => {
                             document.getElementById('modalProduct').showModal();
                             setProduct(item);
-                            console.log(product);
                           }}
                         />
                       </button>
@@ -327,7 +326,7 @@ export default function Product() {
           <div>
             <div className="text-lg ">Product name</div>
             <input
-              value={product.name}
+              value={product.name || ''}
               type="text"
               className={inputStyle}
               onChange={(e) => setProduct({ ...product, name: e.target.value })}
@@ -336,7 +335,7 @@ export default function Product() {
           <div className="mt-3">
             <div className="text-lg ">Cost</div>
             <input
-              value={product.cost}
+              value={product.cost || ""}
               type="number"
               className={inputStyle}
               onChange={(e) => setProduct({ ...product, cost: e.target.value })}
@@ -345,7 +344,7 @@ export default function Product() {
           <div className="mt-3">
             <div className="text-lg">Price</div>
             <input
-              value={product.price}
+              value={product.price || ""}
               type="number"
               className={inputStyle}
               onChange={(e) =>
@@ -356,7 +355,7 @@ export default function Product() {
           <div className="mt-3">
             <div className="text-lg mt-1">Product picture</div>
             <div>
-              {previewUrl.length > 0 ? (
+              {/* {previewUrl.length > 0 ? (
                 <img
                   src={previewUrl}
                   alt="Preview"
@@ -372,7 +371,8 @@ export default function Product() {
                   alt="Preview"
                   className="h-40 w-40 object-cover mb-2"
                 />
-              )}
+              )} */}
+              <div>{showImage(product)}</div>
               <p>Preview</p>
               <input
                 type="file"

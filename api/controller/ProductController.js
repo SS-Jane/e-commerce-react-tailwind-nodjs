@@ -57,6 +57,19 @@ app.delete("/remove/:id", async (req, res) => {
 
 app.put("/update", async (req, res) => {
   try {
+    const fs = require('fs')
+    const oldData = await prisma.product.findFirst({
+      where : {
+        id : parseInt(req.body.id)
+      }
+    })
+
+    const imagePath = './uploads/' + oldData.img;
+
+    if (fs.existsSync(imagePath)) {
+      await fs.unlinkSync(imagePath)
+    }
+    
     await prisma.product.update({
       data: req.body,
       where: {

@@ -355,7 +355,7 @@ export default function Product() {
           <div className="mt-3">
             <div className="text-lg mt-1">Product picture</div>
             <div>
-              {/* {previewUrl.length > 0 ? (
+              {previewUrl.length > 0 ? (
                 <img
                   src={previewUrl}
                   alt="Preview"
@@ -371,8 +371,8 @@ export default function Product() {
                   alt="Preview"
                   className="h-40 w-40 object-cover mb-2"
                 />
-              )} */}
-              <div>{showImage(product)}</div>
+              )}
+              {/* <div>{showImage(product)}</div> */}
               <p>Preview</p>
               <input
                 type="file"

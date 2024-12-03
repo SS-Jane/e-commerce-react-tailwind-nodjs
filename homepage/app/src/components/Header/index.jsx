@@ -1,4 +1,5 @@
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 
 const Header = () => {
   return (
@@ -9,13 +10,25 @@ const Header = () => {
           <div className="flex items-center">
             <a href="/" className="flex items-center space-x-2">
               <img
-                src="/placeholder.svg"
+                src="https://img.freepik.com/free-vector/free-vector-cat-head-simple-mascot-logo-design_779267-1581.jpg?t=st=1733213230~exp=1733216830~hmac=8311f628a139d68a32dd35d2aa3ee559ce14cb4b7d5b1268c41cf353da476c47&w=996"
                 alt="Logo"
                 className="h-8 w-8"
               />
               <span className="text-xl font-bold text-gray-900">Store</span>
             </a>
           </div>
+
+          {/* Search */}
+          <div className='border border-solid border-2 rounded-xl'>
+            <form action="">
+              <div>
+                <input type="text" />
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </div>
+            </form>
+          </div>
+          {/* Search */}
+
           {/* Cart */}
           <div className="flex items-center space-x-4">
           <button className="btn btn-primary">Buy Now

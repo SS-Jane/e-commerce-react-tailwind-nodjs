@@ -1,7 +1,10 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
+import Cart from "./Cart";
+import PropTypes from "prop-types";
 
-const Header = () => {
+const Header = (onSearch) => {
+  const handleSearch = (query) => {
+    onSearch(query);
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white">
       <div className="container mx-auto px-4">
@@ -17,29 +20,15 @@ const Header = () => {
               <span className="text-xl font-bold text-gray-900">Store</span>
             </a>
           </div>
-
-          {/* Search */}
-          <div className='border border-solid border-2 rounded-xl'>
-            <form action="">
-              <div>
-                <input type="text" />
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </div>
-            </form>
-          </div>
-          {/* Search */}
-
-          {/* Cart */}
-          <div className="flex items-center space-x-4">
-          <button className="btn btn-primary">Buy Now
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
-                0
-              </span>
-              </button>
-          </div>
+         <Cart />
         </div>
       </div>
     </header>
   );
 };
+
+Header.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+};
+
 export default Header;

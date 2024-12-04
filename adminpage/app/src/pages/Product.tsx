@@ -25,20 +25,7 @@ export default function Product() {
   const refImg = useRef(); //for referent to image upload function and clear data when save or close modal
   const refExcel = useRef();
 
-  // const TailwindSwal = Swal.mixin({
-  //   customClass: {
-  //     container: 'dark:bg-gray-800 bg-gray-100',
-  //     popup:
-  //       'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
-  //     title: 'text-xl font-bold dark:text-red-400 text-red-600',
-  //     htmlContainer: 'dark:text-gray-300 text-gray-600',
-  //     confirmButton:
-  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-  //     cancelButton:
-  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-  //   },
-  //   buttonsStyling: false,
-  // });
+
 
   const handleSave = async () => {
     try {

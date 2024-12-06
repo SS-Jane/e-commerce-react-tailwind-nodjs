@@ -122,41 +122,56 @@ app.post("/upload", async (req, res) => {
 
 app.post("/uploadFromExcel", (req, res) => {
   try {
+    
     const fileExcel = req.files.fileExcel;
 
-    fileExcel.mv("./uploads/" + fileExcel.name, async (error) => {
-      if (error) throw error;
-      // read from file and insert to database
-      const workbook = new exceljs.Workbook();
-      await workbook.xlsx.readFile("./uploads/" + fileExcel.name);
+    if(fileExcel != undefined) {
 
-      const ws = workbook.getWorksheet(1);
+      if(fileExcel != null) {
 
-      for (let i = 2; i <= ws.rowCount; i++) {
-        const name = ws.getRow(i).getCell(1).value ?? "";
-        const cost = ws.getRow(i).getCell(2).value ?? 0;
-        const price = ws.getRow(i).getCell(3).value ?? 0;
+        fileExcel.mv("./uploads/" + fileExcel.name, async (error) => {
+          if (error) throw error;
+          // read from file and insert to database
+          const workbook = new exceljs.Workbook();
+          await workbook.xlsx.readFile("./uploads/" + fileExcel.name);
+    
+          const ws = workbook.getWorksheet(1);
+    
+          for (let i = 2; i <= ws.rowCount; i++) {
+            const name = ws.getRow(i).getCell(1).value ?? "";
+            const cost = ws.getRow(i).getCell(2).value ?? 0;
+            const price = ws.getRow(i).getCell(3).value ?? 0;
+    
+            //check if each row and cell don't have data
+            if (name != "" && cost >= 0 && price >= 0) {
+              //create data from excel to database
+              await prisma.product.create({
+                data: {
+                  name: name,
+                  cost: cost,
+                  price: price,
+                  img: "",
+                },
+              });
+            }
+            }
+            
+          // remove file from server
+          const fs = require("fs");
+          await fs.unlinkSync("./uploads/" + fileExcel.name);
+    
+          res.send({ message: "success" });
+        });
 
-        //check if each row and cell don't have data
-        if (name != "" && cost >= 0 && price >= 0) {
-          //create data from excel to database
-          await prisma.product.create({
-            data: {
-              name: name,
-              cost: cost,
-              price: price,
-              img: "",
-            },
-          });
-        }
-        }
-        
-      // remove file from server
-      const fs = require("fs");
-      await fs.unlinkSync("./uploads/" + fileExcel.name);
+      } else {
+        res.status(500).send({ message : 'File excel is null'})
+      } 
+      
+    } else {
+        res.status(500).send({ message : 'File excel is undefined'})
+    }
 
-      res.send({ message: "success" });
-    });
+   
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

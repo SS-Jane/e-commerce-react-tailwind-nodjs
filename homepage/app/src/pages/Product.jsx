@@ -76,10 +76,12 @@ const Products = () => {
       title: "Success!!",
       text: "Item added to cart",
       icon: "success",
-      timer: 1500,
+      timer : 1000,
       showConfirmButton: false,
     });
   };
+
+  
 
 
 
@@ -90,9 +92,9 @@ const Products = () => {
           <Loader />
         </div>
       ) : (
-        products.map((item) => (
+        products.map((item, index) => (
           <div
-            key={item.id}
+            key={`${item.id}-${index}`}
             className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
           >
             <div className="aspect-square overflow-hidden bg-gray-100">

@@ -10,7 +10,7 @@ import config from "../../../config";
 import Swal from "sweetalert2";
 
 const Cart = () => {
-  const { cartItems, removeFromCart } = useCart();
+  const { cartItems, removeFromCart, clearCart } = useCart();
   const [sumQty, setSumQty] = useState(0);
   const [sumPrice, setSumPrice] = useState(0);
 
@@ -53,14 +53,15 @@ const Cart = () => {
       const res = await axios.post(config.apiPath + "/api/sale/save", payload);
 
       if (res.data.message === "success") {
-        localStorage.removeItem("cartItems");
-
         Swal.fire({
           target: document.getElementById("modalCart"),
           title: "Save data",
           text: "Saved your data",
           icon: "success",
         });
+        localStorage.removeItem("cartItems");
+        clearCart();
+        clearFormCustomer();
       }
     } catch (error) {
       Swal.fire({
@@ -70,6 +71,14 @@ const Cart = () => {
         icon: "error",
       });
     }
+  };
+
+  const clearFormCustomer = () => {
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerAddress("");
+    setPayDate(dayjs(new Date()).format("YYYY-MM-DD"));
+    setPayTime("");
   };
 
   return (
@@ -97,9 +106,9 @@ const Cart = () => {
           </thead>
           <tbody>
             {cartItems.length > 0 ? (
-              cartItems.map((item) => {
+              cartItems.map((item, index) => {
                 return (
-                  <tr key={item.id}>
+                  <tr key={`${item.id}-${index}`}>
                     <td className="text-lg">{item.name}</td>
                     <td className="text-end text-lg">
                       {typeof item.price === "number"
@@ -150,6 +159,7 @@ const Cart = () => {
               <input
                 type="text"
                 placeholder="Enter name"
+                value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
               />
@@ -159,6 +169,7 @@ const Cart = () => {
               <input
                 type="number"
                 placeholder="Enter phone number"
+                value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
               />
@@ -168,6 +179,7 @@ const Cart = () => {
               <input
                 type="text"
                 placeholder="Enter address"
+                value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
               />
@@ -189,6 +201,7 @@ const Cart = () => {
               </label>
               <input
                 type="time"
+                value={payTime}
                 onChange={(e) => setPayTime(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
               />

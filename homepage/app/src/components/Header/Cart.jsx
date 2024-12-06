@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import axios from "axios";
 import config from "../../../config";
+import Swal from "sweetalert2";
 
 const Cart = () => {
   const { cartItems, removeFromCart } = useCart();
@@ -40,28 +41,30 @@ const Cart = () => {
 
   const handleSave = async () => {
     try {
-        const payload = {
-            customerName : customerName,
-            customerPhone : customerPhone,
-            customerAddress : customerAddress,
-            payDate : payDate,
-            payTime : payTime,
-            cartItems : cartItems
-        }
+      const payload = {
+        customerName: customerName,
+        customerPhone: customerPhone,
+        customerAddress: customerAddress,
+        payDate: payDate,
+        payTime: payTime,
+        cartItems: cartItems,
+      };
 
-        const res = await axios.post(config.apiPath + '/api/sale/save', payload)
+      const res = await axios.post(config.apiPath + "/api/sale/save", payload);
 
-        if(res.data.message === 'success') {
-            localStorage.removeItem('cartItems')
+      if (res.data.message === "success") {
+        localStorage.removeItem("cartItems");
 
-            Swal.fire({
-                title : 'Save data',
-                text : 'Saved your data',
-                icon : 'success'
-            })
-        }
+        Swal.fire({
+          target: document.getElementById("modalCart"),
+          title: "Save data",
+          text: "Saved your data",
+          icon: "success",
+        });
+      }
     } catch (error) {
       Swal.fire({
+        target: document.getElementById("modalCart"),
         title: "error",
         text: error.message,
         icon: "error",

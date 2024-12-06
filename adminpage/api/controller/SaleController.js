@@ -55,4 +55,22 @@ app.get('/list', async (req,res) => {
     }
 })
 
+app.get('/billInfo/:billSaleId', async (req,res) => {
+    try {
+        const results = await prisma.billSaleDetail.findMany({
+            where : {
+                billSaleId : parseInt(req.params.billSaleId)
+            },
+            orderBy : {
+                id : 'desc'
+            }
+        })
+
+        res.send({ results : results })
+        console.log(results);
+    } catch (error) {
+        res.status(500).send({ error : error.message })
+    }
+})
+
 module.exports = app;

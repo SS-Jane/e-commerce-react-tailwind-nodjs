@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from './Breadcrumbs/Breadcrumb';
+import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import config from '../../config';

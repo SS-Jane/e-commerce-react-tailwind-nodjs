@@ -8,7 +8,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import DefaultLayout from './layout/DefaultLayout';
 import Product from './pages/Product';
-import BillSale from './components/BillSale';
+import BillSale from './pages/BillSale';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);

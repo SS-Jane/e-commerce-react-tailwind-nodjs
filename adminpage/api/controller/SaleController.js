@@ -16,7 +16,6 @@ app.post("/save", async (req, res) => {
     });
 
     console.log(req.body);
-    
 
     for (let i = 0; i < req.body.cartItems.length; i++) {
       const rowProduct = await prisma.product.findFirst({
@@ -41,36 +40,39 @@ app.post("/save", async (req, res) => {
   }
 });
 
-app.get('/list', async (req,res) => {
-    try {  
-        const results = await prisma.billSale.findMany({
-            orderBy : {
-                id : 'desc'
-            }
-        })
+app.get("/list", async (req, res) => {
+  try {
+    const results = await prisma.billSale.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
 
-        res.send({ results : results })
-    } catch (error) {
-        res.status(500).send({ error : error.message })
-    }
-})
+    res.send({ results: results });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-app.get('/billInfo/:billSaleId', async (req,res) => {
-    try {
-        const results = await prisma.billSaleDetail.findMany({
-            where : {
-                billSaleId : parseInt(req.params.billSaleId)
-            },
-            orderBy : {
-                id : 'desc'
-            }
-        })
+app.get("/billInfo/:billSaleId", async (req, res) => {
+  try {
+    const results = await prisma.billSaleDetail.findMany({
+      include: {
+        Product: true,
+      },
+      where: {
+        billSaleId: parseInt(req.params.billSaleId),
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
 
-        res.send({ results : results })
-        console.log(results);
-    } catch (error) {
-        res.status(500).send({ error : error.message })
-    }
-})
+    res.send({ results: results });
+    console.log(results);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
 module.exports = app;

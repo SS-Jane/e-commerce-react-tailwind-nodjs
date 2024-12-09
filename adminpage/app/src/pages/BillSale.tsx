@@ -4,12 +4,15 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import config from '../../config';
 import dayjs from 'dayjs';
+import MyModal from '../components/Modal';
 
 const BillSale = () => {
   const [billSales, setBillSales] = useState([]);
+  const [billSaleDetails, setBillSaleDetails] = useState([]);
 
-  const tbodyStyle = `px-4 py-2 text-black dark:text-white text-center border-r border-gray-300 dark:border-strokedark`
-  const theadStyle = 'text-black dark:text-white text-center border-r border-gray-300 dark:border-strokedark'
+  const tbodyStyle = `px-4 py-2 text-black dark:text-white text-center border-r border-gray-300 dark:border-strokedark`;
+  const theadStyle =
+    'text-black dark:text-white text-center border-r border-gray-300 dark:border-strokedark';
 
   useEffect(() => {
     fetchData();
@@ -27,6 +30,27 @@ const BillSale = () => {
       }
     } catch (error) {
       TailwindSwal.fire({
+        title: 'error',
+        text: error.message,
+        icon: 'error',
+      });
+    }
+  };
+
+  const openModalInfo = async (item) => {
+    try {
+      const res = await axios.get(
+        config.apiPath + '/api/sale/billInfo/' + item.id,
+        config.headers(),
+      );
+      if (res.data.results !== undefined) {
+        console.log(res.data.results);
+
+        setBillSaleDetails(res.data.results);
+      }
+    } catch (error) {
+      TailwindSwal.fire({
+        target: document.getElementById('modalInfo'),
         title: 'error',
         text: error.message,
         icon: 'error',
@@ -61,18 +85,10 @@ const BillSale = () => {
                 <th className={`text-xl w-2/12 ${theadStyle}`}>
                   Customer Name
                 </th>
-                <th className={`text-xl w-1/12 ${theadStyle}`}>
-                  Phone
-                </th>
-                <th className={`text-xl w-3/12 ${theadStyle}`}>
-                  Address
-                </th>
-                <th className={`text-xl w-1/12 ${theadStyle}`}>
-                  Pay Date
-                </th>
-                <th className={`text-xl w-1/12 ${theadStyle}`}>
-                  Pay Time
-                </th>
+                <th className={`text-xl w-1/12 ${theadStyle}`}>Phone</th>
+                <th className={`text-xl w-3/12 ${theadStyle}`}>Address</th>
+                <th className={`text-xl w-1/12 ${theadStyle}`}>Pay Date</th>
+                <th className={`text-xl w-1/12 ${theadStyle}`}>Pay Time</th>
                 <th className="w-4/12"></th>
               </tr>
             </thead>
@@ -88,28 +104,32 @@ const BillSale = () => {
                           : 'bg-white dark:bg-gray-700'
                       }`}
                     >
-                      <td className={tbodyStyle}>
-                        {item.customerName}
-                      </td>
-                      <td className={tbodyStyle}>
-                        {item.customerPhone}
-                      </td>
-                      <td className={tbodyStyle}>
-                        {item.customerAddress}
-                      </td>
+                      <td className={tbodyStyle}>{item.customerName}</td>
+                      <td className={tbodyStyle}>{item.customerPhone}</td>
+                      <td className={tbodyStyle}>{item.customerAddress}</td>
                       <td className={tbodyStyle}>
                         {dayjs(item.payDate).format('DD/MM/YYYY')}
                       </td>
-                      <td className={tbodyStyle}>
-                        {item.payTime}
-                      </td>
+                      <td className={tbodyStyle}>{item.payTime}</td>
                       <td className="px-4 py-2 text-center">
-                        <button className="btn btn-secondary text-white mr-3">List</button>
-                        <button className="btn btn-info text-white mr-3">Payed</button>
+                        <button
+                          onClick={(e) => {
+                            document.getElementById('modalInfo').showModal();
+                            openModalInfo(item);
+                          }}
+                          className="btn btn-secondary text-white mr-3"
+                        >
+                          List
+                        </button>
+                        <button className="btn btn-info text-white mr-3">
+                          Payed
+                        </button>
                         <button className="btn btn-success text-white mr-3">
                           Deliver
                         </button>
-                        <button className="btn bg-red-500 text-white">Cancel</button>
+                        <button className="btn bg-red-500 text-white">
+                          Cancel
+                        </button>
                       </td>
                     </tr>
                   );
@@ -128,6 +148,47 @@ const BillSale = () => {
           </table>
         </div>
       </div>
+      <MyModal id="modalInfo" title="Bill Info">
+        <table className="mt-3 min-w-full border border-gray-200 rounded-lg dark:border-strokedark">
+          <thead className="bg-gray-100 dark:bg-boxdark dark:border-strokedark ">
+            <tr>
+              <th className="text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-white">
+                List
+              </th>
+              <th className="text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-white">
+                Price
+              </th>
+              <th className="text-left px-4 py-2 text-sm font-medium text-gray-700 dark:text-white">
+                Qty.
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {billSaleDetails.length > 0 ? (
+              billSaleDetails.map((item) => (
+                <tr key={item.id} className="border-t border-gray-200 dark:bg-gray-700 dark:border-strokedark">
+                  <td className="px-4 py-2 text-sm text-gray-800 dark:text-white">
+                    {item.Product.name}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-800 dark:text-white">
+                    {parseInt(item.price).toLocaleString('th-TH')}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-800 dark:text-white">1</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="px-4 py-4 text-center text-sm text-gray-500 italic"
+                >
+                  No items available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </MyModal>
     </>
   );
 };

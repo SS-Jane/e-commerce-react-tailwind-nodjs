@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import MyModal from '../components/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRectangleList } from '@fortawesome/free-regular-svg-icons';
-import { faSackDollar } from '@fortawesome/free-solid-svg-icons';
+import { faSackDollar, faTruck } from '@fortawesome/free-solid-svg-icons';
 
 const BillSale = () => {
   const [billSales, setBillSales] = useState([]);
@@ -70,41 +70,77 @@ const BillSale = () => {
   const handlePay = async (item) => {
     try {
       const button = await TailwindSwal.fire({
-        title : 'Comfire transection',
-        text : 'Payed and check imformation',
-        icon : 'question',
-        showCancelButton : true,
-        showConfirmButton : true,
-      })
+        title: 'Comfire transection',
+        text: 'Payed and check imformation?',
+        icon: 'question',
+        showCancelButton: true,
+        showConfirmButton: true,
+      });
 
       if (button.isConfirmed) {
-        const res = await axios.get(config.apiPath + '/api/sale/updateStatusToPay/' + item.id, config.headers())
+        const res = await axios.get(
+          config.apiPath + '/api/sale/updateStatusToPay/' + item.id,
+          config.headers(),
+        );
 
-        if(res.data.message === 'success') {
+        if (res.data.message === 'success') {
           TailwindSwal.fire({
-            title : 'Save',
-            test : 'Saved information transaction',
-            icon : 'success',
-            timer : 1000
-          })
+            title: 'Save',
+            test: 'Saved information transaction',
+            icon: 'success',
+            timer: 1000,
+          });
 
           fetchData();
         }
       }
     } catch (error) {
       TailwindSwal.fire({
-        title : 'error',
-        text : error.message,
-        icon : 'error'
-      })
+        title: 'error',
+        text: error.message,
+        icon: 'error',
+      });
     }
-  }
+  };
+
+  const handleSend = async (item) => {
+    try {
+      const button = await TailwindSwal.fire({
+        title: 'Comfirm delivery product',
+        text: 'Are you confirm delivery product to customer?',
+        icon: 'question',
+        showCancelButton: true,
+        showConfirmButton: true,
+      });
+
+      if (button.isConfirmed) {
+        const res = await axios.get(
+          config.apiPath + '/api/sale/updateStatusToSend/' + item.id,
+          config.headers(),
+        );
+        if (res.data.message === 'success') {
+          TailwindSwal.fire({
+            title: 'success',
+            text: 'Saved information delivery',
+            icon: 'success',
+          });
+        }
+      }
+    } catch (error) {
+      TailwindSwal.fire({
+        title: 'error',
+        text: error.massage,
+        icon: 'error',
+      });
+    }
+  };
+
   const TailwindSwal = Swal.mixin({
     customClass: {
       container: 'dark:bg-gray-800 bg-gray-100',
       popup:
         'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
-      title: 'text-xl font-bold dark:text-primary text-primary',
+      title: 'text-xl font-bold dark:text-primary text-primary  ',
       htmlContainer: 'dark:text-gray-300 text-gray-600',
       confirmButton:
         'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
@@ -170,8 +206,12 @@ const BillSale = () => {
                           <FontAwesomeIcon icon={faSackDollar} />
                           Payed
                         </button>
-                        <button className="btn btn-success text-white mr-3">
-                          Deliver
+                        <button
+                          className="btn btn-success text-white mr-3"
+                          onClick={() => handleSend(item)}
+                        >
+                          <FontAwesomeIcon icon={faTruck} />
+                          Delivered
                         </button>
                         <button className="btn bg-red-500 text-white">
                           Cancel

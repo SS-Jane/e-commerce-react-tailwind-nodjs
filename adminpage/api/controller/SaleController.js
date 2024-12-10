@@ -69,10 +69,26 @@ app.get("/billInfo/:billSaleId", async (req, res) => {
     });
 
     res.send({ results: results });
-    console.log(results);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 });
+
+app.get('/updateStatusToPay/:billSaleId', async (req,res) => {
+  try {
+    await prisma.billSale.update({
+      data : {
+        status : 'pay'
+      },
+      where : {
+        id : parseInt(req.params.billSaleId)
+      }
+    })
+
+    res.send({ message : 'success' })
+  } catch (error) {
+    res.status(500).send({ error : error.message })
+  }
+})
 
 module.exports = app;

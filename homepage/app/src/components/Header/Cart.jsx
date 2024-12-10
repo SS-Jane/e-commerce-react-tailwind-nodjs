@@ -137,7 +137,7 @@ const Cart = () => {
         </table>
         <div className="container-sum text-center bg-gray-800 text-white py-4 rounded-lg shadow-md">
           <p className="text-xl font-semibold">
-            {sumQty} items in total. Total cost: {sumPrice.toFixed(2)} THB.
+            {sumQty} items in total. Total cost: {sumPrice.toLocaleString('th-TH')} THB.
           </p>
         </div>
         <div className="mt-3">

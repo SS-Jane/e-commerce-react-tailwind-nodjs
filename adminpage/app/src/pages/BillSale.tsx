@@ -135,6 +135,43 @@ const BillSale = () => {
     }
   };
 
+  const handleCancel = async (item) => {
+    try {
+      const button = await TailwindSwal.fire({
+        title: 'Cancel this bill',
+        text: 'Are you confirm cancel this bill?',
+        icon: 'question',
+        showCancelButton: true,
+        showConfirmButton: true,
+      });
+      console.log(button);
+      
+
+      if (button.isConfirmed) {
+        const res = await axios.get(
+          config.apiPath + '/api/sale/updateStatusToCancel/' + item.id,
+          config.headers(),
+        );
+
+        if (res.data.mesaage === 'success') {
+          TailwindSwal.fire({
+            title: 'Save',
+            text: 'Saved cancel bill status',
+            icon: 'success',
+            timer: 1000,
+          });
+          fetchData()
+        }
+      } 
+    } catch (error) {
+      TailwindSwal.fire({
+        title: 'Error',
+        text: error.mesaage,
+        icon: 'error',
+      });
+    }
+  };
+
   const TailwindSwal = Swal.mixin({
     customClass: {
       container: 'dark:bg-gray-800 bg-gray-100',
@@ -213,7 +250,10 @@ const BillSale = () => {
                           <FontAwesomeIcon icon={faTruck} />
                           Delivered
                         </button>
-                        <button className="btn bg-red-500 text-white">
+                        <button
+                          onClick={() => handleCancel(item)}
+                          className="btn bg-red-500 text-white border border-0"
+                        >
                           Cancel
                         </button>
                       </td>

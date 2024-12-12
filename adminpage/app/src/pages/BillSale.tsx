@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import MyModal from '../components/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRectangleList } from '@fortawesome/free-regular-svg-icons';
-import { faSackDollar, faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faSackDollar, faTruck,faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const BillSale = () => {
   const [billSales, setBillSales] = useState([]);
@@ -124,6 +124,8 @@ const BillSale = () => {
             text: 'Saved information delivery',
             icon: 'success',
           });
+
+          fetchData();
         }
       }
     } catch (error) {
@@ -134,6 +136,76 @@ const BillSale = () => {
       });
     }
   };
+
+  const handleCancel = async (item) => {
+    try {
+      const button = await TailwindSwal.fire({
+        title: 'Cancel this bill',
+        text: 'Are you confirm cancel this bill?',
+        icon: 'question',
+        showCancelButton: true,
+        showConfirmButton: true,
+      });
+      console.log(button);
+
+      if (button.isConfirmed) {
+        const res = await axios.get(
+          config.apiPath + '/api/sale/updateStatusToCancel/' + item.id,
+          config.headers(),
+        );
+
+        if (res.data.mesaage === 'success') {
+          TailwindSwal.fire({
+            title: 'Save',
+            text: 'Saved cancel bill status',
+            icon: 'success',
+            timer: 1000,
+          });
+          fetchData();
+        }
+      }
+    } catch (error) {
+      TailwindSwal.fire({
+        title: 'Error',
+        text: error.mesaage,
+        icon: 'error',
+      });
+    }
+  };
+
+  const displayStatusText = (item) => {
+    const baseStyles =
+      "text-white text-center py-2 px-4 rounded-xl shadow-md inline-block";
+    switch (item.status) {
+      case "wait":
+        return (
+          <div className={`${baseStyles} bg-pink-400`}>
+            Wait check bill
+          </div>
+        );
+      case "payed":
+        return (
+          <div className={`${baseStyles} bg-info`}>
+            Payed
+          </div>
+        );
+      case "delivered":
+        return (
+          <div className={`${baseStyles} bg-success`}>
+            Delivered
+          </div>
+        );
+      case "cancel":
+        return (
+          <div className={`${baseStyles} bg-red-500`}>
+            Cancel Bill
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+  
 
   const TailwindSwal = Swal.mixin({
     customClass: {
@@ -166,6 +238,7 @@ const BillSale = () => {
                 <th className={`text-xl w-3/12 ${theadStyle}`}>Address</th>
                 <th className={`text-xl w-1/12 ${theadStyle}`}>Pay Date</th>
                 <th className={`text-xl w-1/12 ${theadStyle}`}>Pay Time</th>
+                <th className={`text-xl w-1/12 ${theadStyle}`}>Status</th>
                 <th className="w-4/12"></th>
               </tr>
             </thead>
@@ -177,8 +250,8 @@ const BillSale = () => {
                       key={item.id}
                       className={`${
                         index % 2 === 0
-                          ? 'bg-gray-50 dark:bg-gray-600 '
-                          : 'bg-white dark:bg-gray-700 '
+                          ? 'bg-gray-100 dark:bg-gray-600 '
+                          : 'bg-gray-200 dark:bg-gray-700 '
                       }`}
                     >
                       <td className={tbodyStyle}>{item.customerName}</td>
@@ -188,34 +261,41 @@ const BillSale = () => {
                         {dayjs(item.payDate).format('DD/MM/YYYY')}
                       </td>
                       <td className={tbodyStyle}>{item.payTime}</td>
+                      <td className={tbodyStyle}>{displayStatusText(item)}</td>
                       <td className="px-4 py-2 text-center">
-                        <button
-                          onClick={(e) => {
-                            document.getElementById('modalInfo').showModal();
-                            openModalInfo(item);
-                          }}
-                          className="btn btn-secondary text-white mr-3"
-                        >
-                          <FontAwesomeIcon icon={faRectangleList} />
-                          List
-                        </button>
-                        <button
-                          className="btn btn-info text-white mr-3"
-                          onClick={() => handlePay(item)}
-                        >
-                          <FontAwesomeIcon icon={faSackDollar} />
-                          Payed
-                        </button>
-                        <button
-                          className="btn btn-success text-white mr-3"
-                          onClick={() => handleSend(item)}
-                        >
-                          <FontAwesomeIcon icon={faTruck} />
-                          Delivered
-                        </button>
-                        <button className="btn bg-red-500 text-white">
-                          Cancel
-                        </button>
+                        <div className="flex flex-wrap justify-center gap-3">
+                          <button
+                            onClick={(e) => {
+                              document.getElementById('modalInfo').showModal();
+                              openModalInfo(item);
+                            }}
+                            className="btn bg-pink-400 text-white flex items-center gap-2 px-4 py-2 rounded-md shadow-md hover:bg-pink-600 w-full sm:w-auto border-0"
+                          >
+                            <FontAwesomeIcon icon={faRectangleList} />
+                            <span>List</span>
+                          </button>
+                          <button
+                            className="btn btn-info text-white flex items-center gap-2 px-4 py-2 rounded-md shadow-md hover:bg-info-dark w-full sm:w-auto"
+                            onClick={() => handlePay(item)}
+                          >
+                            <FontAwesomeIcon icon={faSackDollar} />
+                            <span>Payed</span>
+                          </button>
+                          <button
+                            className="btn btn-success text-white flex items-center gap-2 px-4 py-2 rounded-md shadow-md hover:bg-success-dark w-full sm:w-auto"
+                            onClick={() => handleSend(item)}
+                          >
+                            <FontAwesomeIcon icon={faTruck} />
+                            <span>Delivered</span>
+                          </button>
+                          <button
+                            onClick={() => handleCancel(item)}
+                            className="btn bg-red-500 text-white flex items-center gap-2 px-4 py-2 rounded-md shadow-md hover:bg-red-600 w-full sm:w-auto border-0"
+                          >
+                            <FontAwesomeIcon icon={faTimes} />
+                            <span>Cancel</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

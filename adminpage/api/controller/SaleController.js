@@ -78,7 +78,7 @@ app.get("/updateStatusToPay/:billSaleId", async (req, res) => {
   try {
     await prisma.billSale.update({
       data: {
-        status: "pay",
+        status: "payed",
       },
       where: {
         id: parseInt(req.params.billSaleId),
@@ -95,7 +95,7 @@ app.get("/updateStatusToSend/:billSaleId", async (req, res) => {
   try {
     await prisma.billSale.update({
       data: {
-        status: "send",
+        status: "delivered",
       },
       where: {
         id: parseInt(req.params.billSaleId),
@@ -104,6 +104,110 @@ app.get("/updateStatusToSend/:billSaleId", async (req, res) => {
     res.send({ message: "success" });
   } catch (error) {
     res.sendStatus(500).send({ message: error.message });
+  }
+});
+
+app.get("/updateStatusToCancel/:billSaleId", async (req, res) => {
+  try {
+    await prisma.billSale.update({
+      data: {
+        status: "cancel",
+      },
+      where: {
+        id: parseInt(req.params.billSaleId),
+      },
+    });
+    res.send({ message: "success" });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/dashboard", async (req, res) => {
+  try {
+    let arr = [];
+    let myDate = new Date();
+    let year = myDate.getFullYear();
+
+    for (let i = 1; i <= 12; i++) {
+      const dayInMonth = new Date(year, i, 0).getDate();
+      const billSaleInMonth = await prisma.billSale.findMany({
+        where: {
+          payDate: {
+            gte: new Date(year + "-" + i + "-01"),
+            lte: new Date(year + "-" + i + "-" + dayInMonth),
+          },
+        },
+      });
+
+      let sumPrice = 0;
+      let sumCost = 0;
+
+      for (let j = 0; j < billSaleInMonth.length; j++) {
+        const billSaleObject = billSaleInMonth[j];
+        const sum = await prisma.billSaleDetail.aggregate({
+          _sum: {
+            price: true,
+            cost: true,
+          },
+          where: {
+            billSaleId: billSaleObject.id,
+          },
+        });
+        sumPrice = sum._sum.price ?? 0;
+        sumCost = sum._sum.cost ?? 0;
+      }
+      arr.push({
+        month: i,
+        sumPrice: sumPrice,
+        sumCost: sumCost,
+      });
+    }
+    res.send({ results: arr });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/dashboard/profit", async (req, res) => {
+  try {
+    const billSales = await prisma.billSale.findMany({
+      where: {
+        status: {
+          in: ["payed", "delivered"],
+        },
+      },
+    });
+    let totalProfit = 0;
+    let totalPrice = 0;
+    let totalCost = 0;
+
+    for (const billSale of billSales) {
+      const billSaleDetails = await prisma.billSaleDetail.aggregate({
+        _sum: {
+          price: true,
+          cost: true,
+        },
+        where: {
+          billSaleId: billSale.id,
+        },
+      });
+
+      const price = billSaleDetails._sum.price ?? 0;
+      const cost = billSaleDetails._sum.cost ?? 0;
+
+      (totalPrice += price), (totalCost += cost);
+      totalProfit += price - cost;
+    }
+    const results = {
+      totalPrice: totalPrice,
+      totalCost: totalCost,
+      totalProfit: totalProfit,
+    };
+
+    res.send({ results: results });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 

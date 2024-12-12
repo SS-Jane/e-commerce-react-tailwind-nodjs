@@ -45,7 +45,7 @@ const Cart = () => {
         customerName: customerName,
         customerPhone: customerPhone,
         customerAddress: customerAddress,
-        payDate: payDate,
+        payDate: dayjs(payDate).format("YYYY-MM-DD"),
         payTime: payTime,
         cartItems: cartItems,
       };
@@ -81,6 +81,12 @@ const Cart = () => {
     setPayTime("");
   };
 
+  const isFormValid =
+    customerName.trim() &&
+    customerPhone.trim() &&
+    customerAddress.trim() &&
+    payDate;
+
   return (
     <div className="text-primary">
       <button
@@ -112,7 +118,7 @@ const Cart = () => {
                     <td className="text-lg">{item.name}</td>
                     <td className="text-end text-lg">
                       {typeof item.price === "number"
-                        ? item.price.toFixed(2)
+                        ? item.price.toLocaleString("th-TH")
                         : item.price}
                     </td>
                     <td className="text-end text-lg">1</td>
@@ -137,7 +143,8 @@ const Cart = () => {
         </table>
         <div className="container-sum text-center bg-gray-800 text-white py-4 rounded-lg shadow-md">
           <p className="text-xl font-semibold">
-            {sumQty} items in total. Total cost: {sumPrice.toLocaleString('th-TH')} THB.
+            {sumQty} items in total. Total cost:{" "}
+            {sumPrice.toLocaleString("th-TH")} THB.
           </p>
         </div>
         <div className="mt-3">
@@ -162,6 +169,7 @@ const Cart = () => {
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                required
               />
             </div>
             <div>
@@ -172,6 +180,7 @@ const Cart = () => {
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                required
               />
             </div>
             <div className="md:col-span-2">
@@ -182,6 +191,7 @@ const Cart = () => {
                 value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                required
               />
             </div>
             <div>
@@ -193,6 +203,7 @@ const Cart = () => {
                 value={payDate}
                 onChange={(e) => setPayDate(e.target.value)}
                 className="mt-2 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                required
               />
             </div>
             <div>
@@ -210,7 +221,12 @@ const Cart = () => {
           <div className="text-right mt-6">
             <button
               onClick={handleSave}
-              className="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md flex items-center gap-2"
+              disabled={!isFormValid}
+              className={`btn btn-primary px-6 py-2 rounded-md flex items-center gap-2 ${
+                isFormValid
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
             >
               <FontAwesomeIcon icon={faCheck} />
               Confirm

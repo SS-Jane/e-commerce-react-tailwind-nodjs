@@ -3,10 +3,15 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import config from "../../config";
 import Loader from "../common/Loader.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
+import { useCart } from "../context/CartContext.jsx";
 
-export default function Products() {
+const Products = () => {
   const [products, setProducts] = useState([]);
   const [loader, setLoader] = useState(true);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchData();
@@ -51,43 +56,79 @@ export default function Products() {
     }
   };
 
-  return  (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Products</h1>
-        
-        {loader ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <Loader />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((item) => (
-              <div
-                key={item.id}
-                className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div className="aspect-square overflow-hidden bg-gray-100">
-                  <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
-                    {showImage(item)}
-                  </div>
-                </div>
-                <div className="p-4 space-y-3">
-                  <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                    {item.name}
-                  </h2>
-                  <p className="text-xl font-bold text-primary">
-                    ${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
-                  </p>
-                  <button className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200">
-                    Buy Now
-                  </button>
-                </div>
+  const handleSearch = (query) => {
+    if (query.trim() === "") {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter((product) =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  };
+
+  const displayProducts =
+    filteredProducts.length > 0 ? filteredProducts : products;
+
+  const handleAddToCart = (item) => {
+    addToCart(item);
+    Swal.fire({
+      title: "Success!!",
+      text: "Item added to cart",
+      icon: "success",
+      timer : 1000,
+      showConfirmButton: false,
+    });
+  };
+
+  
+
+
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {loader ? (
+        <div className="col-span-full flex justify-center items-center min-h-[400px]">
+          <Loader />
+        </div>
+      ) : (
+        products.map((item, index) => (
+          <div
+            key={`${item.id}-${index}`}
+            className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+          >
+            <div className="aspect-square overflow-hidden bg-gray-100">
+              <figure className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+                {showImage(item)}
+              </figure>
+            </div>
+            <div className="p-4 space-y-2">
+              <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+                {item.name}
+              </h2>
+              <p className="text-lg font-bold text-primary">
+                $
+                {typeof item.price === "number"
+                  ? item.price.toFixed(2)
+                  : item.price}
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={() => handleAddToCart(item)}
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                >
+                  <FontAwesomeIcon icon={faCartPlus} className="mr-2" />
+                  Add to Cart
+                </button>
               </div>
-            ))}
+            </div>
           </div>
-        )}
-      </div>
+        ))
+      )}
     </div>
   );
-}
+
+  
+};
+
+export default Products;

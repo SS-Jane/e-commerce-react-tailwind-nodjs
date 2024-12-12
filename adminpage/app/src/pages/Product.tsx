@@ -25,20 +25,7 @@ export default function Product() {
   const refImg = useRef(); //for referent to image upload function and clear data when save or close modal
   const refExcel = useRef();
 
-  // const TailwindSwal = Swal.mixin({
-  //   customClass: {
-  //     container: 'dark:bg-gray-800 bg-gray-100',
-  //     popup:
-  //       'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
-  //     title: 'text-xl font-bold dark:text-red-400 text-red-600',
-  //     htmlContainer: 'dark:text-gray-300 text-gray-600',
-  //     confirmButton:
-  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-  //     cancelButton:
-  //       'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
-  //   },
-  //   buttonsStyling: false,
-  // });
+
 
   const handleSave = async () => {
     try {
@@ -64,7 +51,7 @@ export default function Product() {
       }
 
       if (res.data.message === 'success') {
-        Swal.fire({
+        TailwindSwal.fire({
           target: document.getElementById('modalProduct'),
           title: 'save',
           text: 'success',
@@ -79,7 +66,7 @@ export default function Product() {
         });
       }
     } catch (error) {
-      Swal.fire({
+      TailwindSwal.fire({
         target: document.getElementById('modalProduct'),
         title: 'error',
         text: error.message,
@@ -108,7 +95,7 @@ export default function Product() {
         return res.data.newName;
       }
     } catch (error) {
-      Swal.fire({
+      TailwindSwal.fire({
         title: 'error',
         text: error.message,
         icon: 'error',
@@ -169,7 +156,7 @@ export default function Product() {
       );
 
       if (res.data.message === 'success') {
-        Swal.fire({
+        TailwindSwal.fire({
           target: document.getElementById('modalExcel'),
           title: 'Upload file',
           text: 'Upload file success',
@@ -184,7 +171,7 @@ export default function Product() {
     
 
     } catch (error) {
-      Swal.fire({
+      TailwindSwal.fire({
         target: document.getElementById('modalExcel'),
         title: 'error',
         text: error.message,
@@ -205,7 +192,7 @@ export default function Product() {
         setProducts(res.data.results);
       }
     } catch (error) {
-      Swal.fire({
+      TailwindSwal.fire({
         title: 'error',
         text: error.message,
         icon: 'error',
@@ -214,20 +201,20 @@ export default function Product() {
   };
 
   const showImage = (item) => {
-    if (item.img !== '') {
+    if (item.img !== "") {
       return (
         <img
           alt="Product-image"
-          className="w-30"
-          src={config.apiPath + '/uploads/' + item.img}
+          className="h-full w-full object-cover"
+          src={config.apiPath + "/uploads/" + item.img}
         />
       );
     } else {
       return (
         <img
           alt="default-image"
-          className="w-30"
-          src={config.apiPath + '/uploads/default-image.png'}
+          className="h-full w-full object-cover"
+          src={config.apiPath + "/uploads/default-image.png"}
         />
       );
     }
@@ -236,6 +223,25 @@ export default function Product() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const TailwindSwal = Swal.mixin({
+    customClass: {
+      container: 'dark:bg-gray-800 bg-gray-100',
+      popup:
+        'rounded-lg shadow-lg bg-white text-gray-800 dark:bg-gray-900 dark:text-white p-6',
+      title: 'text-xl font-bold dark:text-red-400 text-red-600',
+      htmlContainer: 'dark:text-gray-300 text-gray-600',
+      confirmButton:
+        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+      cancelButton:
+        'dark:bg-gray-600 dark:hover:bg-gray-700 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mx-2',
+    },
+    buttonsStyling: false,
+  });
+
+  const tbodyStyle = `px-4 py-2 h-4/5 text-black dark:text-white text-center border-r border-gray-300 dark:border-strokedark`
+  const theadStyle = 'text-black h-20 dark:text-white text-center border-r border-gray-300 dark:border-strokedark'
+
   return (
     <>
       <Breadcrumb pageName="Product" />
@@ -265,19 +271,19 @@ export default function Product() {
         </div>
 
         <div className="container-products overflow-x-auto">
-          <table className="table">
+          <table className="table-auto w-full text-left">
             <thead>
-              <tr>
-                <th className="text-xl w-3/12 text-black dark:text-white text-center">
+              <tr className="bg-gray-200 dark:bg-boxdark h-20">
+                <th className={`text-xl w-3/12 ${theadStyle}`}>
                   Product picture
                 </th>
-                <th className="text-xl w-4/12 text-black dark:text-white">
+                <th className={`text-xl w-4/12 ${theadStyle}`}>
                   Name
                 </th>
-                <th className="text-xl w-1/12 text-black dark:text-white text-center">
+                <th className={`text-xl w-1/12 ${theadStyle}`}>
                   Cost
                 </th>
-                <th className="text-xl w-1/12 text-black dark:text-white text-center">
+                <th className={`text-xl w-1/12 ${theadStyle}`}>
                   Price
                 </th>
                 <th className="w-2/12"></th>
@@ -285,18 +291,23 @@ export default function Product() {
             </thead>
             <tbody>
               {products.length > 0 ? (
-                products.map((item) => (
+                products.map((item,index) => (
+                  
                   <tr
-                    key={item.id}
-                    className="hover:bg-primary hover:text-white text-lg"
-                  >
-                    <td className="flex justify-center items-center">
+                  key={item.id}
+                  className={`hover:bg-primary hover:text-white text-lg ${
+                    index % 2 === 0
+                      ? 'bg-gray-50 dark:bg-gray-600'
+                      : 'bg-white dark:bg-gray-700'
+                  }`}
+                >
+                    <td className={`flex justify-center align-middle ${tbodyStyle}`}>
                       {showImage(item)}
                     </td>
-                    <td>{item.name}</td>
-                    <td className="text-center">{item.cost}</td>
-                    <td className="text-center">{item.price}</td>
-                    <td>
+                    <td className={tbodyStyle}>{item.name}</td>
+                    <td className={tbodyStyle}>{item.cost}</td>
+                    <td className={tbodyStyle}>{item.price}</td>
+                    <td className={`align-middle ${tbodyStyle}`}>
                       <button className="btn btn-info mx-1">
                         <FontAwesomeIcon
                           icon={faPenToSquare}

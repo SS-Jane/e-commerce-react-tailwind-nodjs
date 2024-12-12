@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import { CartProvider } from "./context/CartContext.jsx";
 
 import DefaultLayout from "./layout/DefaultLayout";
 import PageTitle from "./components/PageTitle";
@@ -16,19 +17,21 @@ function App() {
   return loader ? (
     <Loader />
   ) : (
-    <DefaultLayout>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <PageTitle title="Super Shopping page" />
-              <Products />
-            </>
-          }
-        />
-      </Routes>
-    </DefaultLayout>
+    <CartProvider>
+      <DefaultLayout>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <PageTitle title="Super Shopping page" />
+                <Products />
+              </>
+            }
+          />
+        </Routes>
+      </DefaultLayout>
+    </CartProvider>
   );
 }
 

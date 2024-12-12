@@ -3,12 +3,12 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import DefaultLayout from './layout/DefaultLayout';
 import Product from './pages/Product';
+import BillSale from './pages/BillSale';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,7 +31,7 @@ function App() {
           path='/'
           element={
             <>
-              <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <PageTitle title="eCommerce Dashboard" />
               <ECommerce />
             </>
           }
@@ -40,7 +40,7 @@ function App() {
           path="/profile"
           element={
             <>
-              <PageTitle title="Profile | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <PageTitle title="Profile" />
               <Profile />
             </>
           }
@@ -49,7 +49,7 @@ function App() {
           path="/product"
           element={
             <>
-              <PageTitle title="Tables | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <PageTitle title="Product" />
               <Product />
             </>
           }
@@ -58,17 +58,17 @@ function App() {
           path="/settings"
           element={
             <>
-              <PageTitle title="Settings | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <PageTitle title="Settings" />
               <Settings />
             </>
           }
         />
         <Route
-          path="/chart"
+          path="/billSale"
           element={
             <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Chart />
+              <PageTitle title="Sale report" />
+              <BillSale />
             </>
           }
         />

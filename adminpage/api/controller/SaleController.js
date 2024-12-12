@@ -78,7 +78,7 @@ app.get("/updateStatusToPay/:billSaleId", async (req, res) => {
   try {
     await prisma.billSale.update({
       data: {
-        status: "pay",
+        status: "payed",
       },
       where: {
         id: parseInt(req.params.billSaleId),
@@ -95,7 +95,7 @@ app.get("/updateStatusToSend/:billSaleId", async (req, res) => {
   try {
     await prisma.billSale.update({
       data: {
-        status: "send",
+        status: "delivered",
       },
       where: {
         id: parseInt(req.params.billSaleId),
@@ -164,6 +164,48 @@ app.get("/dashboard", async (req, res) => {
       });
     }
     res.send({ results: arr });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get("/dashboard/profit", async (req, res) => {
+  try {
+    const billSales = await prisma.billSale.findMany({
+      where: {
+        status: {
+          in: ["payed", "delivered"],
+        },
+      },
+    });
+    let totalProfit = 0;
+    let totalPrice = 0;
+    let totalCost = 0;
+
+    for (const billSale of billSales) {
+      const billSaleDetails = await prisma.billSaleDetail.aggregate({
+        _sum: {
+          price: true,
+          cost: true,
+        },
+        where: {
+          billSaleId: billSale.id,
+        },
+      });
+
+      const price = billSaleDetails._sum.price ?? 0;
+      const cost = billSaleDetails._sum.cost ?? 0;
+
+      (totalPrice += price), (totalCost += cost);
+      totalProfit += price - cost;
+    }
+    const results = {
+      totalPrice: totalPrice,
+      totalCost: totalCost,
+      totalProfit: totalProfit,
+    };
+
+    res.send({ results: results });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

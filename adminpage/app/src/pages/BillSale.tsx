@@ -183,13 +183,13 @@ const BillSale = () => {
             Wait check bill
           </div>
         );
-      case "pay":
+      case "payed":
         return (
           <div className={`${baseStyles} bg-info`}>
             Payed
           </div>
         );
-      case "send":
+      case "delivered":
         return (
           <div className={`${baseStyles} bg-success`}>
             Delivered
@@ -250,8 +250,8 @@ const BillSale = () => {
                       key={item.id}
                       className={`${
                         index % 2 === 0
-                          ? 'bg-gray-50 dark:bg-gray-600 '
-                          : 'bg-white dark:bg-gray-700 '
+                          ? 'bg-gray-100 dark:bg-gray-600 '
+                          : 'bg-gray-200 dark:bg-gray-700 '
                       }`}
                     >
                       <td className={tbodyStyle}>{item.customerName}</td>

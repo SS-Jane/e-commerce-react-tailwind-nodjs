@@ -1,16 +1,83 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartThree from '../../components/Charts/ChartThree';
 import ChartTwo from '../../components/Charts/ChartTwo';
-import ChatCard from '../../components/Chat/ChatCard';
-import TableOne from '../../components/Tables/TableOne';
+import axios from 'axios';
+import config from '../../../config';
 
 const ECommerce: React.FC = () => {
+  const [totalProfit, setTotalProfit] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [TotalCost, setTotalCost] = useState(0)
+
+  useEffect(() => {
+    fetchDataSummary()
+  }, []);
+
+  const fetchDataSummary = async () => {
+    try {
+      const res = await axios.get(`${config.apiPath}/api/sale/dashboard/profit`,config.headers())
+      console.log(res);
+      let dataTotalPrice = 0
+      let dataTotalCost = 0
+      let dataTotalProfit = 0 
+      if(res.data.results){
+        dataTotalPrice = res.data.results.totalPrice
+        dataTotalCost = res.data.results.totalCost
+        dataTotalProfit = res.data.results.totalProfit
+      }
+
+      setTotalPrice(dataTotalPrice)
+      setTotalCost(dataTotalCost)
+      setTotalProfit(dataTotalProfit)
+      
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+      
+    }
+  }
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        config.apiPath + '/api/sale/dashboard',
+        config.headers(),
+      );
+
+      let dataSale = [];
+      let dataCost = [];
+      let dataRevenue = [];
+ 
+
+      if (res.data.results) {
+        res.data.results.forEach((item) => {
+          dataSale.push(item.sumPrice);
+          dataCost.push(item.sumCost);
+          dataRevenue.push(item.sumPrice - item.sumCost);
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
+  };
+
+  function formatLargeNumber(number) {
+    const suffixes = ['', 'K', 'M', 'B', 'T'];
+  
+    for (let i = suffixes.length - 1; i >= 0; i--) {
+      if (Math.abs(number) >= 1000 ** i) {
+        return (number / 1000 ** i).toFixed(1) + suffixes[i];
+      }
+    }
+  
+    return number;
+  }
+  
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats title="Total Profit" total="$45,2K" rate="4.35%" levelUp>
+        <CardDataStats title="Total Profit" total={formatLargeNumber(totalProfit)} rate="4.35%" levelUp>
           <svg
             className="fill-primary dark:fill-white"
             width="20"

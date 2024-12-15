@@ -25,7 +25,15 @@ app.post("/create", async (req, res) => {
 
 app.get("/list", async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 20
+
+    const skip = (page -1) * pageSize
+    const take = pageSize
+
     const data = await prisma.product.findMany({
+      skip : skip,
+      take : take,
       orderBy: {
         id: "desc",
       },
@@ -33,7 +41,19 @@ app.get("/list", async (req, res) => {
         status: "use",
       },
     });
-    res.send({ results: data });
+
+    const totalCount = await prisma.product.counr({
+      where : {
+        status : 'use'
+      }
+    })
+    const totalPages = Math.ceil(totalCount / pageSize)
+
+    res.send({ results: data,
+      totalCount : totalCount,
+      totalPages : totalPages,
+      currentPage : page,
+     });
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -177,4 +197,16 @@ app.post("/uploadFromExcel", (req, res) => {
   }
 });
 
+app.get('/total', async (req,res) => {
+  try {
+    const results = await prisma.product.count( {
+      where : {
+        status : 'use'
+      }
+    })
+    res.send({ results : results })
+  } catch (error) {
+    res.status(500).send({ error : error.message })
+  }
+})
 module.exports = app;

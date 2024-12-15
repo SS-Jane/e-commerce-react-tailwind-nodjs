@@ -118,13 +118,13 @@ const BillSale = () => {
           config.apiPath + '/api/sale/updateStatusToSend/' + item.id,
           config.headers(),
         );
+        
         if (res.data.message === 'success') {
           TailwindSwal.fire({
             title: 'success',
             text: 'Saved information delivery',
             icon: 'success',
           });
-
           fetchData();
         }
       }
@@ -146,21 +146,23 @@ const BillSale = () => {
         showCancelButton: true,
         showConfirmButton: true,
       });
-      console.log(button);
+
 
       if (button.isConfirmed) {
         const res = await axios.get(
           config.apiPath + '/api/sale/updateStatusToCancel/' + item.id,
           config.headers(),
         );
-
-        if (res.data.mesaage === 'success') {
+        if (res.data.message === 'success') {
+          console.log('Success');
+          
           TailwindSwal.fire({
             title: 'Save',
             text: 'Saved cancel bill status',
             icon: 'success',
             timer: 1000,
           });
+
           fetchData();
         }
       }
@@ -180,7 +182,7 @@ const BillSale = () => {
       case "wait":
         return (
           <div className={`${baseStyles} bg-pink-400`}>
-            Wait check bill
+            Wait check
           </div>
         );
       case "payed":
@@ -195,7 +197,7 @@ const BillSale = () => {
             Delivered
           </div>
         );
-      case "cancel":
+      case "canceled":
         return (
           <div className={`${baseStyles} bg-red-500`}>
             Cancel Bill

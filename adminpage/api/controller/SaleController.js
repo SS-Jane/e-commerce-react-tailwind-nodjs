@@ -111,7 +111,7 @@ app.get("/updateStatusToCancel/:billSaleId", async (req, res) => {
   try {
     await prisma.billSale.update({
       data: {
-        status: "cancel",
+        status: "canceled",
       },
       where: {
         id: parseInt(req.params.billSaleId),
@@ -210,5 +210,6 @@ app.get("/dashboard/profit", async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
+
 
 module.exports = app;

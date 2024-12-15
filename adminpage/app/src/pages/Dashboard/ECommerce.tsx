@@ -10,15 +10,17 @@ const ECommerce: React.FC = () => {
   const [totalProfit, setTotalProfit] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
   const [TotalCost, setTotalCost] = useState(0)
+  const [totalProducts, setTotalProducts] = useState(0)
 
   useEffect(() => {
     fetchDataSummary()
+    fetchDataTotalProducts()
   }, []);
 
   const fetchDataSummary = async () => {
     try {
       const res = await axios.get(`${config.apiPath}/api/sale/dashboard/profit`,config.headers())
-      console.log(res);
+
       let dataTotalPrice = 0
       let dataTotalCost = 0
       let dataTotalProfit = 0 
@@ -62,6 +64,17 @@ const ECommerce: React.FC = () => {
     }
   };
 
+  const fetchDataTotalProducts = async () => {
+    try {
+      const res = await axios.get(`${config.apiPath}/product/total`,config.headers())
+      if (res.data.results) {
+        setTotalProducts(res.data.results)
+      }
+
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
+  }
   function formatLargeNumber(number) {
     const suffixes = ['', 'K', 'M', 'B', 'T'];
   
@@ -100,7 +113,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Product" total="2.450" rate="2.59%" levelUp>
+        <CardDataStats title="Total Product" total={totalProducts}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -119,7 +132,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Users" total="3.456" rate="0.95%" levelDown>
+        {/* <CardDataStats title="Total Users" total="3.456" rate="0.95%" levelDown>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -141,15 +154,13 @@ const ECommerce: React.FC = () => {
               fill=""
             />
           </svg>
-        </CardDataStats>
+        </CardDataStats> */}
       </div>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <ChartOne />
         <ChartTwo />
-        <ChartThree />
-       
-       
+        {/* <ChartThree /> */}
       </div>
     </>
   );

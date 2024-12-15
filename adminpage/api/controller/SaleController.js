@@ -129,24 +129,24 @@ app.get("/dashboard", async (req, res) => {
     let myDate = new Date();
     let year = myDate.getFullYear();
 
-    for (let i = 1; i <= 12; i++) {
-      const dayInMonth = new Date(year, i, 0).getDate();
+    for (let i = 1; i <= 12; i++) { // loop 12 month
+      const dayInMonth = new Date(year, i, 0).getDate(); //find days in month
       const billSaleInMonth = await prisma.billSale.findMany({
         where: {
           payDate: {
-            gte: new Date(year + "-" + i + "-01"),
-            lte: new Date(year + "-" + i + "-" + dayInMonth),
+            gte: new Date(year + "-" + i + "-01"),  // start find bill at day 1
+            lte: new Date(year + "-" + i + "-" + dayInMonth), // end find at last day in month
           },
         },
       });
-
+      // billSaleInMonth = find bill in 1 year , results in bill each month (12 bills)
       let sumPrice = 0;
       let sumCost = 0;
 
       for (let j = 0; j < billSaleInMonth.length; j++) {
-        const billSaleObject = billSaleInMonth[j];
-        const sum = await prisma.billSaleDetail.aggregate({
-          _sum: {
+        const billSaleObject = billSaleInMonth[j];  // loop only month have bill
+        const sum = await prisma.billSaleDetail.aggregate({   
+          _sum: {                   // sum func
             price: true,
             cost: true,
           },
@@ -154,7 +154,8 @@ app.get("/dashboard", async (req, res) => {
             billSaleId: billSaleObject.id,
           },
         });
-        sumPrice = sum._sum.price ?? 0;
+
+        sumPrice = sum._sum.price ?? 0;   // store value to sumPrice if null show 0
         sumCost = sum._sum.cost ?? 0;
       }
       arr.push({

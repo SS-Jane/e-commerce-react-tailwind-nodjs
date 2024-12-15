@@ -12,6 +12,8 @@ const Products = () => {
   const [loader, setLoader] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const { addToCart } = useCart();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchData();
@@ -21,11 +23,15 @@ const Products = () => {
     setTimeout(() => setLoader(false), 1000);
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1) => {
     try {
-      const res = await axios.get(config.apiPath + "/product/list");
+      const res = await axios.get(
+        config.apiPath + `/product/list?page=${page}&pageSize=20`
+      );
       if (res.data.results !== undefined) {
         setProducts(res.data.results);
+        setTotalPages(res.data.totalPages);
+        setCurrentPage(res.data.currentPage);
       }
     } catch (error) {
       Swal.fire({
@@ -76,15 +82,14 @@ const Products = () => {
       title: "Success!!",
       text: "Item added to cart",
       icon: "success",
-      timer : 1000,
+      timer: 1000,
       showConfirmButton: false,
     });
   };
 
-  
-
-
-
+  const handlePageChange = (page) => {
+    fetchData(page);
+  };
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {loader ? (
@@ -92,43 +97,59 @@ const Products = () => {
           <Loader />
         </div>
       ) : (
-        products.map((item, index) => (
-          <div
-            key={`${item.id}-${index}`}
-            className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
-          >
-            <div className="aspect-square overflow-hidden bg-gray-100">
-              <figure className="w-full h-full transition-transform duration-300 group-hover:scale-105">
-                {showImage(item)}
-              </figure>
-            </div>
-            <div className="p-4 space-y-2">
-              <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
-                {item.name}
-              </h2>
-              <p className="text-lg font-bold text-primary">
-                $
-                {typeof item.price === "number"
-                  ? item.price.toFixed(2)
-                  : item.price}
-              </p>
-              <div className="pt-2">
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
-                >
-                  <FontAwesomeIcon icon={faCartPlus} className="mr-2" />
-                  Add to Cart
-                </button>
+        <>
+          {products.map((item, index) => (
+            <div
+              key={`${item.id}-${index}`}
+              className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+            >
+              <div className="aspect-square overflow-hidden bg-gray-100">
+                <figure className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+                  {showImage(item)}
+                </figure>
+              </div>
+              <div className="p-4 space-y-2">
+                <h2 className="text-lg font-semibold text-gray-800 line-clamp-1">
+                  {item.name}
+                </h2>
+                <p className="text-lg font-bold text-primary">
+                  $
+                  {typeof item.price === "number"
+                    ? item.price.toFixed(2)
+                    : item.price}
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+                  >
+                    <FontAwesomeIcon icon={faCartPlus} className="mr-2" />
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
+          ))}
+
+          <div className="pagination col-span-full flex justify-center mt-6">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-4 py-2 mx-1 border rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
           </div>
-        ))
+        </>
       )}
     </div>
   );
-
-  
 };
 
 export default Products;

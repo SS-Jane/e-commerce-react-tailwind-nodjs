@@ -27,7 +27,7 @@ model Product {
   cost            Int
   price           Int
   img             String
-  status          String           @default("use")
+  status          String           @default("use") //wait, payed, delivered, canceled
   BillSaleDetails BillSaleDetail[]
 }
 

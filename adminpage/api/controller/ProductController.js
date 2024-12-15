@@ -42,7 +42,7 @@ app.get("/list", async (req, res) => {
       },
     });
 
-    const totalCount = await prisma.product.counr({
+    const totalCount = await prisma.product.count({
       where : {
         status : 'use'
       }
